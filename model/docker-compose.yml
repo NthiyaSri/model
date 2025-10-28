@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: shopdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+  backend:
+    build: ./backend
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      SECRET_KEY: ${SECRET_KEY}
+      FLASK_ENV: ${FLASK_ENV}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      BACKEND_PORT: ${BACKEND_PORT}
+      JWT_COOKIE_SECURE: ${JWT_COOKIE_SECURE}
+      AI_KEY: ${AI_KEY}
+    depends_on:
+      - db
+    ports:
+      - "${BACKEND_PORT:-5001}:5001"
+    volumes:
+      - ./backend/uploads:/app/uploads
+volumes:
+  db_data:
